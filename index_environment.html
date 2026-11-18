@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>WebVR Scavenger Hunt</title>
+  
+  <!-- 1. A-Frame Core Library -->
+  <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+  <!-- 2. Environment Component -->
+  <script src="https://unpkg.com/aframe-environment-component@1.3.3/dist/aframe-environment-component.min.js"></script>
+
+  <!-- 3. Custom JavaScript for Gameplay -->
+  <script>
+    // Global variables to track progress
+    let score = 0;
+    const totalTreasures = 3;
+
+    // Register the custom component
+    AFRAME.registerComponent('collectible', {
+      init: function () {
+        let el = this.el;
+
+        el.addEventListener('click', function () {
+          // Hide the clicked object
+          el.setAttribute('visible', 'false');
+          
+          // Remove the clickable class so it cannot be clicked while hidden
+          el.classList.remove('clickable');
+
+          // Update the score variable and the on-screen text
+          score++;
+          document.getElementById('scoreDisplay').innerText = "Score: " + score + " / " + totalTreasures;
+
+          // Check for victory condition
+          if (score === totalTreasures) {
+            document.getElementById('scoreDisplay').innerText = "You found them all! You win!";
+            document.getElementById('scoreDisplay').style.color = "#00ff00";
+          }
+        });
+      }
+    });
+  </script>
+
+  <!-- 4. Basic CSS for the 2D UI Overlay -->
+  <style>
+    #ui-container {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 100; /* Ensures it renders over the 3D canvas */
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: white;
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 15px 25px;
+      border-radius: 8px;
+      font-size: 24px;
+      font-weight: bold;
+      pointer-events: none; /* Prevents the UI from blocking mouse clicks */
+    }
+  </style>
+</head>
+<body>
+
+  <!-- The 2D Screen UI -->
+  <div id="ui-container">
+    <span id="scoreDisplay">Score: 0 / 3</span>
+  </div>
+
+  <!-- The 3D Scene -->
+  <a-scene>
+    
+    <!-- Asset Management (Where Tinkercad .glb files are pre-loaded) -->
+    <a-assets>
+      <!-- Example format: <a-asset-item id="gem-model" src="assets/gem.glb"></a-asset-item> -->
+    </a-assets>
+
+    <!-- The Procedural Environment -->
+    <a-entity environment="preset: forest; dressingAmount: 50; groundColor: #445; grid: none"></a-entity>
+
+    <!-- The Player Camera & Cursor -->
+    <a-camera position="0 1.6 0">
+      <!-- The raycaster ensures performance isn't wasted checking if the sky or ground was clicked -->
+      <a-cursor color="yellow" raycaster="objects: .clickable"></a-cursor>
+    </a-camera>
+
+    <!-- 
+      The Hidden Treasures 
+      Using basic shapes as placeholders. Students will replace these with their Tinkercad imports.
+    -->
+    
+    <!-- Treasure 1 -->
+    <a-box class="clickable" collectible color="gold" position="-3 1 -4" rotation="0 45 0" 
+           animation="property: rotation; to: 0 405 0; loop: true; dur: 3000">
+    </a-box>
+
+    <!-- Treasure 2 -->
+    <a-sphere class="clickable" collectible color="magenta" position="4 1.5 -6" radius="0.5"
+              animation="property: position; to: 4 2 -6; dir: alternate; loop: true; dur: 2000">
+    </a-sphere>
+
+    <!-- Treasure 3 -->
+    <a-octahedron class="clickable" collectible color="cyan" position="0 0.5 -8" radius="0.6"
+                  animation="property: rotation; to: 360 360 0; loop: true; dur: 4000">
+    </a-octahedron>
+
+  </a-scene>
+</body>
+</html>
